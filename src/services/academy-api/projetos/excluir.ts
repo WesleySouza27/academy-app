@@ -1,15 +1,16 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
+import { academyApi } from "../http-config";
 
-export async function excluirProjeto(projetoId: string): Promise<string> {
+export async function excluirProjeto(
+  projetoId: string,
+  token: string
+): Promise<string> {
   try {
-    const resultado = await axios.delete(
-      `http://localhost:3030/projetos/${projetoId}`,
-      {
-        headers: {
-          Authorization: "Bearer 8ec9f646-641b-419b-a31f-6a4dbe448246",
-        },
-      }
-    );
+    const resultado = await academyApi.delete(`/projetos/${projetoId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return resultado.data.mensagem;
   } catch (error) {

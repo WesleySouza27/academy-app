@@ -1,11 +1,11 @@
-import axios from "axios";
 import { Projeto } from "../../../interfaces/projeto.interface";
+import { academyApi } from "../http-config";
 
-export async function listarProjetos(): Promise<Projeto[]> {
+export async function listarProjetos(token: string): Promise<Projeto[]> {
   try {
-    const resposta = await axios.get("http://localhost:3030/projetos", {
+    const resposta = await academyApi.get("/projetos", {
       headers: {
-        Authorization: "Bearer 8ec9f646-641b-419b-a31f-6a4dbe448246",
+        Authorization: `Bearer ${token}`,
       },
     });
 

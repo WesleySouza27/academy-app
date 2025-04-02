@@ -1,17 +1,17 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { Projeto } from "../../../interfaces/projeto.interface";
+import { academyApi } from "../http-config";
 
-export async function cadastrarProjeto(dados: Projeto): Promise<string> {
+export async function cadastrarProjeto(
+  dados: Projeto,
+  token: string
+): Promise<string> {
   try {
-    const resultado = await axios.post(
-      "http://localhost:3030/projetos",
-      dados,
-      {
-        headers: {
-          Authorization: "Bearer 8ec9f646-641b-419b-a31f-6a4dbe448246",
-        },
-      }
-    );
+    const resultado = await academyApi.post("/projetos", dados, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return resultado.data.mensagem;
   } catch (error) {

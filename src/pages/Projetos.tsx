@@ -5,6 +5,8 @@ import { Projeto } from "../interfaces/projeto.interface";
 import { cadastrarProjeto } from "../services/academy-api/projetos/cadastrar";
 import { atualizarProjeto } from "../services/academy-api/projetos/atualizar";
 import { excluirProjeto } from "../services/academy-api/projetos/excluir";
+import { useNavigate } from "react-router";
+import { logout } from "../services/academy-api/auth/logout";
 
 export function Projetos() {
   const [loading, setLoading] = useState(true);
@@ -16,15 +18,26 @@ export function Projetos() {
     ferramenta: "",
     status: "",
   });
+  const [token, setToken] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const authToken = localStorage.getItem("auth_user_token");
+
+    if (!authToken) {
+      alert("É preciso estar logado para acessar essa página");
+      navigate("/");
+      return;
+    }
+
+    setToken(authToken);
     setLoading(true);
 
-    listarProjetos().then((projetos) => {
+    listarProjetos(authToken).then((projetos) => {
       setLoading(false);
       setListaProjetos(projetos);
     });
-  }, []);
+  }, [navigate]);
 
   async function handleSubmit(evento: React.FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -34,14 +47,14 @@ export function Projetos() {
     let mensagem = "";
 
     if (!formProjeto.id) {
-      mensagem = await cadastrarProjeto(formProjeto);
+      mensagem = await cadastrarProjeto(formProjeto, token);
     } else {
-      mensagem = await atualizarProjeto(formProjeto);
+      mensagem = await atualizarProjeto(formProjeto, token);
     }
 
     alert(mensagem);
 
-    const projetos = await listarProjetos();
+    const projetos = await listarProjetos(token);
     setListaProjetos(projetos);
     setLoading(false);
     resetForm();
@@ -77,17 +90,34 @@ export function Projetos() {
 
     if (confirma) {
       setLoading(true);
-      const mensagem = await excluirProjeto(projeto.id);
+      const mensagem = await excluirProjeto(projeto.id, token);
       alert(mensagem);
 
-      const projetos = await listarProjetos();
+      const projetos = await listarProjetos(token);
       setListaProjetos(projetos);
       setLoading(false);
     }
   }
 
+  async function handleClickLogout() {
+    const deuBom = await logout(token);
+
+    if (!deuBom) {
+      alert("Erro no logout, tente novamente!");
+      return;
+    }
+
+    localStorage.removeItem("auth_user_token");
+    navigate("/");
+  }
+
   return (
     <>
+      <p style={{ textAlign: "end" }}>
+        <button type="button" onClick={handleClickLogout}>
+          Sair
+        </button>
+      </p>
       <h1>Projetos</h1>
 
       <form onSubmit={handleSubmit}>
