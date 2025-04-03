@@ -1,6 +1,8 @@
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { login } from "../services/academy-api/auth/login";
 import { useEffect } from "react";
+import { Form } from "../components/Form/styles";
+import { Container } from "../components/Container/styled";
 
 export function Login() {
   const navigate = useNavigate();
@@ -36,22 +38,28 @@ export function Login() {
   }
 
   return (
-    <>
-      <h1>Login</h1>
+    <Container>
+      <div>
+        <h1>Login</h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="">E-mail: </label>
-          <input type="text" name="email" />
-        </div>
+        <Form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="">E-mail: </label>
+            <input type="text" name="email" />
+          </div>
 
-        <div>
-          <label htmlFor="">Senha: </label>
-          <input type="password" name="password" />
-        </div>
+          <div>
+            <label htmlFor="">Senha: </label>
+            <input type="password" name="password" />
+          </div>
 
-        <button type="submit">Acessar</button>
-      </form>
-    </>
+          <button type="submit">Acessar</button>
+        </Form>
+
+        <small>
+          Não tem conta? <Link to="/cadastrar">Cadastre-se</Link>
+        </small>
+      </div>
+    </Container>
   );
 }
