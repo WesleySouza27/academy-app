@@ -12,6 +12,8 @@ export const Form = styled.form`
     display: block;
     padding: 12px 6px;
     width: 100%;
+    border-radius: 6px;
+    border: 2px solid rebeccapurple;
   }
 
   button {
@@ -19,6 +21,7 @@ export const Form = styled.form`
     padding: 12px 18px;
     background-color: transparent;
     border: 2px solid rebeccapurple;
+    border-radius: 6px;
     color: rebeccapurple;
     transition: ease-in 0.5s;
   }
