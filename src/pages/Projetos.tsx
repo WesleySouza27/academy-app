@@ -5,7 +5,7 @@ import { Projeto } from "../interfaces/projeto.interface";
 import { cadastrarProjeto } from "../services/academy-api/projetos/cadastrar";
 import { atualizarProjeto } from "../services/academy-api/projetos/atualizar";
 import { excluirProjeto } from "../services/academy-api/projetos/excluir";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom"; // Corrigido para "react-router-dom"
 import { logout } from "../services/academy-api/auth/logout";
 
 export function Projetos() {
@@ -18,7 +18,6 @@ export function Projetos() {
     ferramenta: "",
     status: "",
   });
-  const [token, setToken] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,17 +25,21 @@ export function Projetos() {
 
     if (!authToken) {
       alert("É preciso estar logado para acessar essa página");
-      navigate("/");
+      navigate("/"); // Redireciona para login
       return;
     }
 
-    setToken(authToken);
     setLoading(true);
 
-    listarProjetos(authToken).then((projetos) => {
-      setLoading(false);
-      setListaProjetos(projetos);
-    });
+    listarProjetos(authToken)
+      .then((projetos) => {
+        setListaProjetos(projetos);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Erro ao carregar projetos:", err);
+        setLoading(false);
+      });
   }, [navigate]);
 
   async function handleSubmit(evento: React.FormEvent<HTMLFormElement>) {
@@ -44,17 +47,24 @@ export function Projetos() {
 
     setLoading(true);
 
+    const authToken = localStorage.getItem("auth_user_token");
+    if (!authToken) {
+      alert("Token de autenticação não encontrado.");
+      navigate("/");
+      return;
+    }
+
     let mensagem = "";
 
     if (!formProjeto.id) {
-      mensagem = await cadastrarProjeto(formProjeto, token);
+      mensagem = await cadastrarProjeto(formProjeto, authToken);
     } else {
-      mensagem = await atualizarProjeto(formProjeto, token);
+      mensagem = await atualizarProjeto(formProjeto, authToken);
     }
 
     alert(mensagem);
 
-    const projetos = await listarProjetos(token);
+    const projetos = await listarProjetos(authToken);
     setListaProjetos(projetos);
     setLoading(false);
     resetForm();
@@ -90,17 +100,31 @@ export function Projetos() {
 
     if (confirma) {
       setLoading(true);
-      const mensagem = await excluirProjeto(projeto.id, token);
+      const authToken = localStorage.getItem("auth_user_token");
+      if (!authToken) {
+        alert("Token de autenticação não encontrado.");
+        navigate("/");
+        return;
+      }
+
+      const mensagem = await excluirProjeto(projeto.id, authToken);
       alert(mensagem);
 
-      const projetos = await listarProjetos(token);
+      const projetos = await listarProjetos(authToken);
       setListaProjetos(projetos);
       setLoading(false);
     }
   }
 
   async function handleClickLogout() {
-    const deuBom = await logout(token);
+    const authToken = localStorage.getItem("auth_user_token");
+    if (!authToken) {
+      alert("Token de autenticação não encontrado.");
+      navigate("/");
+      return;
+    }
+
+    const deuBom = await logout(authToken);
 
     if (!deuBom) {
       alert("Erro no logout, tente novamente!");
@@ -166,7 +190,7 @@ export function Projetos() {
             value={formProjeto.status}
             onChange={handleInputChange}
           >
-            <option value="" selected disabled>
+            <option value="" disabled>
               - Selecione -
             </option>
             <option value="finalizado">Finalizado</option>

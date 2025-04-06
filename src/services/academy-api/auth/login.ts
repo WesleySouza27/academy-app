@@ -13,9 +13,9 @@ export async function login(dados: {
       mensagem: resultado.data.mensagem,
     };
   } catch (error) {
-    if (error instanceof AxiosError) {
+    if (error instanceof AxiosError && error.response) {
       return {
-        mensagem: error.response!.data.mensagem,
+        mensagem: error.response.data.mensagem || "Erro ao realizar login.",
       };
     }
 

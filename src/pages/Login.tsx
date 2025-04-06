@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom"; // Corrigido para "react-router-dom"
 import { login } from "../services/academy-api/auth/login";
 import { useEffect } from "react";
 import { Form } from "../components/Form/styles";
@@ -25,16 +25,22 @@ export function Login() {
       senha: form["password"].value,
     };
 
-    const resposta = await login(credenciais);
+    try {
+      const resposta = await login(credenciais);
 
-    if (!resposta.token) {
-      alert(resposta.mensagem);
-      return;
+      if (!resposta.token) {
+        alert(resposta.mensagem);
+        return;
+      }
+
+      form.reset();
+      localStorage.setItem("auth_user_token", resposta.token);
+      alert("Login realizado com sucesso!");
+      navigate("/projetos");
+    } catch (error) {
+      console.error("Erro ao realizar login:", error);
+      alert("Erro ao conectar ao servidor.");
     }
-
-    form.reset();
-    localStorage.setItem("auth_user_token", resposta.token);
-    navigate("/projetos");
   }
 
   return (
@@ -44,13 +50,13 @@ export function Login() {
 
         <Form onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="">E-mail: </label>
-            <input type="text" name="email" />
+            <label htmlFor="email">E-mail: </label>
+            <input type="email" name="email" required />
           </div>
 
           <div>
-            <label htmlFor="">Senha: </label>
-            <input type="password" name="password" />
+            <label htmlFor="password">Senha: </label>
+            <input type="password" name="password" required />
           </div>
 
           <button type="submit">Acessar</button>
